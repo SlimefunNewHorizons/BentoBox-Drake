@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 240" width="920" height="240" role="img" aria-label="BentoBox Drake Banner">
+  <defs>
+    <linearGradient id="bFondo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#050B14"/>
+      <stop offset="50%" stop-color="#0A1628"/>
+      <stop offset="100%" stop-color="#0F2338"/>
+    </linearGradient>
+    <linearGradient id="acG" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="50%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#34D399"/>
+    </linearGradient>
+    <radialGradient id="bHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Fondo y Resplandor -->
+  <rect width="920" height="240" rx="16" fill="url(#bFondo)"/>
+  <rect width="920" height="240" rx="16" fill="url(#bHalo)"/>
+  <rect x="2" y="2" width="916" height="236" rx="14" fill="none" stroke="url(#acG)" stroke-width="2" opacity="0.45"/>
+  
+  <!-- Icono Central Isla / Cubo Isométrico -->
+  <g transform="translate(460,65) scale(1.4)">
+    <polygon points="0,-24 24,-10 0,4 -24,-10" fill="#06B6D4" opacity="0.85"/>
+    <polygon points="-24,-10 0,4 0,30 -24,16" fill="#059669" opacity="0.95"/>
+    <polygon points="24,-10 0,4 0,30 24,16" fill="#10B981"/>
+    <polygon points="0,-18 16,-8 0,2 -16,-8" fill="#34D399" opacity="0.6"/>
+  </g>
+  
+  <!-- Título Principal -->
+  <text x="460" y="148" text-anchor="middle" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-weight="900" font-size="28" fill="#F8FAFC" letter-spacing="3">
+    BENTOBOX · DRAKE EDITION
+  </text>
+  
+  <!-- Subtítulo -->
+  <text x="460" y="178" text-anchor="middle" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#34D399" letter-spacing="3" opacity="0.95">
+    ISLAND ENGINE · MULTI-MODALITY &amp; ZERO-ITEM-LOSS
+  </text>
+  
+  <!-- Badges Inferiores -->
+  <g transform="translate(460, 208)">
+    <rect x="-240" y="-12" width="110" height="20" rx="4" fill="#0F172A" stroke="#10B981" stroke-width="1"/>
+    <text x="-185" y="2" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" fill="#E2E8F0">DRAKES LABS</text>
+    
+    <rect x="-115" y="-12" width="110" height="20" rx="4" fill="#0F172A" stroke="#06B6D4" stroke-width="1"/>
+    <text x="-60" y="2" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" fill="#E2E8F0">PURPUR 1.21.11</text>
+    
+    <rect x="10" y="-12" width="115" height="20" rx="4" fill="#0F172A" stroke="#F59E0B" stroke-width="1"/>
+    <text x="67" y="2" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" fill="#FDE68A">ZERO-ITEM-LOSS</text>
+    
+    <rect x="140" y="-12" width="105" height="20" rx="4" fill="#0F172A" stroke="#10B981" stroke-width="1"/>
+    <text x="192" y="2" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" fill="#E2E8F0">5 MODALIDADES</text>
+  </g>
+</svg>
