@@ -1,13 +1,25 @@
-# BentoBox
+# BentoBox · DrakesCraft Edition (BentoBox-Drake)
 
-[![Discord](https://img.shields.io/discord/272499714048524288.svg?logo=discord)](https://discord.bentobox.world)
-[![Build Status](https://ci.codemc.io/job/BentoBoxWorld/job/BentoBox/badge/icon)](https://ci.codemc.io/job/BentoBoxWorld/job/BentoBox/)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=BentoBoxWorld_BentoBox&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=BentoBoxWorld_BentoBox)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=BentoBoxWorld_BentoBox&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=BentoBoxWorld_BentoBox)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=BentoBoxWorld_BentoBox&metric=security_rating)](https://sonarcloud.io/dashboard?id=BentoBoxWorld_BentoBox)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=BentoBoxWorld_BentoBox&metric=bugs)](https://sonarcloud.io/dashboard?id=BentoBoxWorld_BentoBox)
+> [!NOTE]
+> **Agradecimientos Especiales & Reconocimiento Upstream:**
+> Queremos expresar nuestro más sincero y profundo agradecimiento a **tastybento**, **Poslovitch** y a toda la **Comunidad de BentoBoxWorld** por haber creado y mantenido uno de los ecosistemas de plugins más sólidos, modulares y revolucionarios en la historia de Minecraft. Este repositorio es un fork downstream de optimización y compatibilidad para la red **DrakesCraft**.
+
+---
+
+## 🌟 Mejoras y Parches de la Edición DrakesCraft
+
+1. **🛡️ Resiliencia Total de Deserialización de Ítems (Zero-Item-Loss / Incidente #276):**
+   - Corrige el problema en `ItemStackTypeAdapter` donde ítems modernos con **Data Components** de Minecraft 1.20.5+ / 1.21+ (como charms de Slimefun, armas con `minecraft:attribute_modifiers` o ítems custom) eran destruidos y convertidos en `AIR` al leer la subclave `type:`.
+   - Implementa deserialización nativa directa vía Bukkit/Paper con fallback de seguridad para garantizar que ningún inventario de jugador pierda ítems jamás.
+2. **⚡ Compatibilidad Nativa con Purpur / Paper 1.21.11:**
+   - Totalmente adaptado para Java 21/25 y la API de Paper 1.21.11 con mappings de Mojang limpios.
+3. **🌐 Armonización de Multi-Modalidad (5 Modalidades de DrakesCraft):**
+   - Reconocimiento y aislamiento contextual entre las 5 modalidades del servidor (`Survival Principal`, `OneBlock`, `SkyBlock`, `Clásico Vainilla` y `Laboratorio Creativo`).
+
+---
 
 # SkyBlock, OneBlock, AcidIsland, and more - all in one plugin
+
 
 [![Discord](https://img.shields.io/discord/272499714048524288.svg?logo=discord)](https://discord.bentobox.world)
 
