@@ -17,7 +17,7 @@
 
 [🌐 Portal Oficial](https://web.drakescraft.cl) ·
 [🎮 Jugar en Vivo](https://web.drakescraft.cl/play) ·
-[💬 Discord Oficial](https://discord.gg/rR7FbfCt9Y) ·
+[💬 Discord Oficial](https://discord.gg/rv3vtXZTk7) ·
 [🏛️ Organización GitHub](https://github.com/DrakesCraft-Labs)
 
 </div>
@@ -27,7 +27,7 @@
 > ### 🏰 ¡Únete a la Red Oficial de DrakesCraft!
 >
 > * 🎮 **IP del Servidor (Java & Bedrock):** `play.drakescraft.cl` *(Puerto Java: `25565` | Puerto Bedrock: `19132`)*
-> * 💬 **Discord de la Comunidad:** [discord.gg/drakescraft](https://discord.gg/rR7FbfCt9Y)
+> * 💬 **Discord de la Comunidad:** [discord.gg/drakescraft](https://discord.gg/rv3vtXZTk7)
 > * 🌐 **Sitio Web:** [web.drakescraft.cl](https://web.drakescraft.cl) · 🛒 **Tienda Oficial:** [web.drakescraft.cl/store](https://web.drakescraft.cl/store.html)
 >
 > *¡Juega en nuestras modalidades de OneBlock y SkyBlock impulsadas por este motor en vivo!*
