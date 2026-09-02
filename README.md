@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/DrakesCraft-Labs/BentoBox-Drake/main/banner.svg" alt="BentoBox Drake Edition" width="100%">
+<img src="banner.svg" alt="BentoBox Drake Edition" width="100%">
 
 # ✦ BentoBox · DrakesCraft Edition ✦
 
