@@ -56,24 +56,36 @@ public class ItemStackTypeAdapter extends TypeAdapter<ItemStack> {
         }
         YamlConfiguration c = new YamlConfiguration();
         String n = reader.nextString();
-        // Verify material type because yaml loading errors of unknown materials cannot be trapped by try clause.
-        if (n.contains("type:")) {
-            String type = n.substring(n.indexOf("type:") + 6);
-            type = type.substring(0, type.indexOf('\n'));
-            Material m = Material.matchMaterial(type);            
-            if (m == null) {
-                BentoBox.getInstance().logWarning("Unknown material: " + type);
-                return new ItemStack(Material.AIR);
-            }
 
-        }
+        // 1. Primary Deserialization: Native Bukkit/Paper deserializer (handles 1.20.5+ / 1.21.11 Data Components, custom NBT, Slimefun)
         try {
             c.loadFromString(n);
-            return c.getItemStack("is");
-        } catch (InvalidConfigurationException e) {
-            BentoBox.getInstance().logError("Cannot load ItemStack serialized as " + n);
-            return new ItemStack(Material.AIR);
+            ItemStack is = c.getItemStack("is");
+            if (is != null) {
+                return is;
+            }
+        } catch (Exception ignored) {
+            // Fall through to legacy parsing fallback
         }
+
+        // 2. Legacy Material Verification (Only fallback if native loadFromString failed)
+        if (n.contains("type:")) {
+            try {
+                String type = n.substring(n.indexOf("type:") + 6);
+                int end = type.indexOf('\n');
+                if (end > 0) {
+                    type = type.substring(0, end).trim().replace("\"", "").replace("'", "");
+                }
+                Material m = Material.matchMaterial(type);            
+                if (m != null) {
+                    return new ItemStack(m);
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        BentoBox.getInstance().logWarning("Cannot load ItemStack safely from data, falling back to AIR: " + (n.length() > 80 ? n.substring(0, 80) + "..." : n));
+        return new ItemStack(Material.AIR);
     }
 
 }
