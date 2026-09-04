@@ -193,7 +193,8 @@ repositories {
     maven("https://repo.onarandombox.com/multiverse-snapshots") { name = "Multiverse-Snapshots" }
     maven("https://mvn.lumine.io/repository/maven-public/") { name = "Lumine-Releases" } // Mythic mobs
     maven("https://repo.clojars.org/") { name = "Clojars" }
-    maven("https://repo.fancyplugins.de/releases") { name = "FancyPlugins-Releases" }
+    // FancyPlugins moved to FancyInnovations; the former host no longer resolves.
+    maven("https://repo.fancyinnovations.com/releases") { name = "FancyInnovations-Releases" }
     maven("https://repo.pyr.lol/snapshots") { name = "Pyr-Snapshots" }
     maven("https://maven.devs.beer/") { name = "MatteoDev" }
     maven("https://repo.mikeprimm.com/") { name = "Dynmap" }

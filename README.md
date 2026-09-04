@@ -1,22 +1,39 @@
-# BentoBox · DrakesCraft Edition (BentoBox-Drake)
+![BentoBox for DrakesCraft](assets/drakescraft-bentobox.svg)
 
-> [!NOTE]
-> **Agradecimientos Especiales & Reconocimiento Upstream:**
-> Queremos expresar nuestro más sincero y profundo agradecimiento a **tastybento**, **Poslovitch** y a toda la **Comunidad de BentoBoxWorld** por haber creado y mantenido uno de los ecosistemas de plugins más sólidos, modulares y revolucionarios en la historia de Minecraft. Este repositorio es un fork downstream de optimización y compatibilidad para la red **DrakesCraft**.
+# BentoBox
 
----
+## DrakesCraft maintenance branch
 
-## 🌟 Mejoras y Parches de la Edición DrakesCraft
+This fork tracks the production `3.17.0` line used by DrakesCraft. It first delegates modern
+ItemStack YAML to Bukkit/Paper so nested Data Component keys such as `type:` cannot be mistaken for
+the material name. Its second persistence guard keeps BentoBox's warnings for malformed real items
+while treating Bukkit's `AIR x0` empty-stack sentinel as expected state. The sentinel is normalized
+before YAML persistence without emitting a misleading warning. The build also uses the current
+FancyInnovations Maven host.
 
-1. **🛡️ Resiliencia Total de Deserialización de Ítems (Zero-Item-Loss / Incidente #276):**
-   - Corrige el problema en `ItemStackTypeAdapter` donde ítems modernos con **Data Components** de Minecraft 1.20.5+ / 1.21+ (como charms de Slimefun, armas con `minecraft:attribute_modifiers` o ítems custom) eran destruidos y convertidos en `AIR` al leer la subclave `type:`.
-   - Implementa deserialización nativa directa vía Bukkit/Paper con fallback de seguridad para garantizar que ningún inventario de jugador pierda ítems jamás.
-2. **⚡ Compatibilidad Nativa con Purpur / Paper 1.21.11:**
-   - Totalmente adaptado para Java 21/25 y la API de Paper 1.21.11 con mappings de Mojang limpios.
-3. **🌐 Armonización de Multi-Modalidad (5 Modalidades de DrakesCraft):**
-   - Reconocimiento y aislamiento contextual entre las 5 modalidades del servidor (`Survival Principal`, `OneBlock`, `SkyBlock`, `Clásico Vainilla` y `Laboratorio Creativo`).
+```mermaid
+flowchart LR
+    A[Stored ItemStack YAML] --> B[Bukkit/Paper native parser]
+    B --> C{Valid ItemStack?}
+    C -- Yes --> D[Preserve material and metadata]
+    C -- No --> E[Conservative legacy fallback]
+    D --> F{AIR with amount 0?}
+    F -- Yes --> G[Normalize silently]
+    F -- No --> H[Keep defensive quantity checks]
+```
 
----
+Release verification uses Java 21 and the repository wrapper:
+
+```bash
+GIT_BRANCH=origin/master ./gradlew clean test shadowJar --no-daemon
+```
+
+[![Discord](https://img.shields.io/discord/272499714048524288.svg?logo=discord)](https://discord.bentobox.world)
+[![Build Status](https://ci.codemc.io/job/BentoBoxWorld/job/BentoBox/badge/icon)](https://ci.codemc.io/job/BentoBoxWorld/job/BentoBox/)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=BentoBoxWorld_BentoBox&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=BentoBoxWorld_BentoBox)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=BentoBoxWorld_BentoBox&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=BentoBoxWorld_BentoBox)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=BentoBoxWorld_BentoBox&metric=security_rating)](https://sonarcloud.io/dashboard?id=BentoBoxWorld_BentoBox)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=BentoBoxWorld_BentoBox&metric=bugs)](https://sonarcloud.io/dashboard?id=BentoBoxWorld_BentoBox)
 
 # SkyBlock, OneBlock, AcidIsland, and more - all in one plugin
 
@@ -143,4 +160,3 @@ dependencies {
 }
 ```
 **Note:** Due to a Gradle issue with versions for Maven, you need to use -SNAPSHOT at the end.
-
