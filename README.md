@@ -49,11 +49,15 @@ Este repositorio (`BentoBox-Drake`) es un fork downstream de optimización cread
 - **Problema en Upstream:** En Minecraft moderno (1.20.5+ y 1.21.11), Paper serializa modificadores y metadatos bajo Data Components (ej: `minecraft:attribute_modifiers: [{type: "minecraft:attack_damage"}]`). El método `ItemStackTypeAdapter.read` original buscaba ciegamente la subcadena `type:`, confundiendo el atributo del charm de Slimefun con el material del ítem y retornando prematuramente `Material.AIR`, destruyendo los ítems del jugador al cambiar de mundo o reiniciar sesión.
 - **Solución Drake:** Implementa deserialización nativa directa de Bukkit/Paper (`YamlConfiguration.loadFromString` + `getItemStack("is")`), garantizando que **el 100% de los charms de Slimefun, armas con atributos custom y lore extendido se conserven intactos** sin pérdida de inventario.
 
-### 2. ⚡ Compatibilidad y Rendimiento en Purpur 1.21.11
+### 2. Persistencia limpia de inventarios vacíos
+- Reconoce `AIR x0` como el sentinel vacío normal de Bukkit y lo normaliza antes de serializar sin emitir una alerta engañosa.
+- Conserva el aviso y el saneamiento para cualquier ítem real con cantidad inválida; no oculta corrupción material.
+
+### 3. ⚡ Compatibilidad y Rendimiento en Purpur 1.21.11
 - Optimizado para Java 21 y Java 25 con runtime Purpur 1.21.11.
 - Mapeos de Mojang limpios y compatibilidad total con remapeo dinámico de Paper.
 
-### 3. 🌐 Armonización de las 5 Modalidades de DrakesCraft
+### 4. 🌐 Armonización de las 5 Modalidades de DrakesCraft
 BentoBox-Drake convive armónicamente con las 5 modalidades de la network sin generar cruces de inventarios ni interferencias:
 
 | Modalidad | Mundos de Juego | Motor Activo | Slimefun / Reglas |
