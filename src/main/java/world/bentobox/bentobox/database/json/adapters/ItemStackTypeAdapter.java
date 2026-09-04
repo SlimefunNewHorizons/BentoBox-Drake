@@ -38,14 +38,23 @@ public class ItemStackTypeAdapter extends TypeAdapter<ItemStack> {
             value = value.clone();
             value.setAmount(MAX_AMOUNT);
         } else if (value.getAmount() < 1) {
-            BentoBox.getInstance().logWarning("ItemStack " + value.getType() + " has quantity " + value.getAmount()
-                    + " which is less than 1. Clamping to 1.");
+            // Bukkit uses AIR with amount 0 as its canonical empty-stack sentinel. It is
+            // valid application state, not malformed item data, so normalizing it for
+            // YAML must not emit an operational warning on every database save.
+            if (isUnexpectedLowAmount(value.getType(), value.getAmount())) {
+                BentoBox.getInstance().logWarning("ItemStack " + value.getType() + " has quantity " + value.getAmount()
+                        + " which is less than 1. Clamping to 1.");
+            }
             value = value.clone();
             value.setAmount(1);
         }
         YamlConfiguration c = new YamlConfiguration();
         c.set("is", value);
         out.value(c.saveToString());
+    }
+
+    static boolean isUnexpectedLowAmount(Material type, int amount) {
+        return amount < 1 && !type.isAir();
     }
 
     @Override
