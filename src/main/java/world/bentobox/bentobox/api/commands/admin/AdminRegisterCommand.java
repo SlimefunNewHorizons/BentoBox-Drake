@@ -32,7 +32,8 @@ public class AdminRegisterCommand extends ConfirmableCommand {
     @Override
     public void setup() {
         setPermission("admin.register");
-        setOnlyPlayer(true);
+        // Not player-only: the console can register an island by giving its x,y,z,
+        // which is the only way to undo an admin delete when no op is in-game.
         setParametersHelp("commands.admin.register.parameters");
         setDescription("commands.admin.register.description");
     }
@@ -40,13 +41,8 @@ public class AdminRegisterCommand extends ConfirmableCommand {
     @Override
     public boolean canExecute(User user, String label, List<String> args) {
         // If args are not right, show help
-        if (args.size() != 1) {
+        if (args.isEmpty() || args.size() > 2) {
             showHelp(this, user);
-            return false;
-        }
-        // Check world
-        if (!getWorld().equals(user.getWorld())) {
-            user.sendMessage("general.errors.wrong-world");
             return false;
         }
         // Get target
@@ -55,14 +51,19 @@ public class AdminRegisterCommand extends ConfirmableCommand {
             user.sendMessage("general.errors.unknown-player", TextVariables.NAME, args.getFirst());
             return false;
         }
+        // Work out which location is being registered: the given x,y,z or where the player stands
+        Location refLocation = getReferenceLocation(user, args);
+        if (refLocation == null) {
+            return false;
+        }
         // Check if this spot is still being deleted
-        closestIsland = Util.getClosestIsland(user.getLocation());
+        closestIsland = Util.getClosestIsland(refLocation);
         if (getPlugin().getIslandDeletionManager().inDeletion(closestIsland)) {
             user.sendMessage("commands.admin.register.in-deletion");
             return false;
         }
         // Check if island is owned
-        Optional<Island> opIsland = getIslands().getIslandAt(user.getLocation());
+        Optional<Island> opIsland = getIslands().getIslandAt(refLocation);
         if (opIsland.isEmpty()) {
             // Reserve spot
             this.askConfirmation(user, user.getTranslation("commands.admin.register.no-island-here"),
@@ -82,6 +83,53 @@ public class AdminRegisterCommand extends ConfirmableCommand {
         }
 
         return true;
+    }
+
+    /**
+     * Works out the location that is being registered. If x,y,z is given, that is
+     * used, otherwise the user's own location is used. The console must give x,y,z
+     * because it is not standing anywhere.
+     *
+     * @param user user running the command
+     * @param args command arguments
+     * @return the location to register, or {@code null} if it could not be resolved,
+     *         in which case the user has already been told why
+     *
+     * @implNote the "specify island location" message is borrowed from the sibling
+     *           unregister command on purpose: locale files already on disk are never
+     *           refreshed from the jar ({@code LocalesManager#copyFile}), so a brand
+     *           new key would render as its own reference on an existing server.
+     */
+    @Nullable
+    private Location getReferenceLocation(User user, List<String> args) {
+        if (args.size() == 2) {
+            if (args.get(1).equalsIgnoreCase("help")) {
+                showHelp(this, user);
+                return null;
+            }
+            String[] xyz = args.get(1).split(",");
+            if (xyz.length != 3) {
+                user.sendMessage("commands.admin.unregister.errors.specify-island-location");
+                return null;
+            }
+            try {
+                return new Location(getWorld(), Integer.parseInt(xyz[0].trim()),
+                        Integer.parseInt(xyz[1].trim()), Integer.parseInt(xyz[2].trim()));
+            } catch (NumberFormatException e) {
+                user.sendMessage("commands.admin.unregister.errors.specify-island-location");
+                return null;
+            }
+        }
+        if (!user.isPlayer()) {
+            // The console is not standing on an island, so it has to say where to look
+            user.sendMessage("commands.admin.unregister.errors.specify-island-location");
+            return null;
+        }
+        if (!getWorld().equals(user.getWorld())) {
+            user.sendMessage("general.errors.wrong-world");
+            return null;
+        }
+        return user.getLocation();
     }
 
     @Override
@@ -129,8 +177,13 @@ public class AdminRegisterCommand extends ConfirmableCommand {
         if (island.isSpawn()) {
             getIslands().clearSpawn(island.getWorld());
         }
-        // Remove deletion status if it has been assigned.
+        // Remove deletion status if it has been assigned. Both flags must be cleared:
+        // setDeleted covers a deletion in progress, setDeletable covers the soft-delete
+        // that /[admin] delete and /island reset leave behind. While deletable is set,
+        // every protection flag is denied on the island (see FlagListener) and the
+        // region files are still queued for the housekeeping purge.
         island.setDeleted(false);
+        island.setDeletable(false);
         user.sendMessage("commands.admin.register.registered-island", TextVariables.XYZ,
                 Util.xyz(island.getCenter().toVector()), TextVariables.NAME, targetName);
         user.sendMessage("general.success");
@@ -145,8 +198,9 @@ public class AdminRegisterCommand extends ConfirmableCommand {
     @Override
     public Optional<List<String>> tabComplete(User user, String alias, List<String> args) {
         String lastArg = !args.isEmpty() ? args.getLast() : "";
-        if (args.isEmpty()) {
-            // Don't show every player on the server. Require at least the first letter
+        if (args.size() != 2) {
+            // Don't show every player on the server. Require at least the first letter,
+            // and don't offer player names where the x,y,z goes.
             return Optional.empty();
         }
         List<String> options = new ArrayList<>(Util.getOnlinePlayerList(user));

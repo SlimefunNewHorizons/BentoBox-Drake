@@ -248,8 +248,9 @@ commands:
           <green>Disminuyó exitosamente </green><aqua>[name] </aqua><green>rango protegido de la isla a </green><aqua></aqua>
           [total] <gray>(</gray><aqua>- [number] </aqua><gray>) </gray><green>.</green>
     register:
-      parameters: <jugador>
-      description: registrar jugador en la isla sin dueño en la que estás
+      parameters: <jugador> [x,y,z]
+      description: registrar jugador en la isla sin dueño en la que estás, o en la que
+        está en x,y,z
       registered-island: '<green>Jugador registrado a la isla en [xyz].</green>'
       reserved-island: '<green>Isla reservada en [xyz] para jugador.</green>'
       already-owned: '<red>La isla ya es propiedad de otro jugador!</red>'

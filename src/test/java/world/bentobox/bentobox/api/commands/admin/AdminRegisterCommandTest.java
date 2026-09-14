@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -86,6 +87,7 @@ class AdminRegisterCommandTest extends CommonTestSetup {
         when(user.getUniqueId()).thenReturn(uuid);
         when(user.getPlayer()).thenReturn(mockPlayer);
         when(user.getName()).thenReturn("tastybento");
+        when(user.isPlayer()).thenReturn(true);
         when(user.getWorld()).thenReturn(world);
         when(user.getLocation()).thenReturn(location);
         when(user.getTranslation(anyString()))
@@ -250,6 +252,59 @@ class AdminRegisterCommandTest extends CommonTestSetup {
         verify(user).sendMessage("commands.admin.register.registered-island", TextVariables.XYZ, "123,123,432", TextVariables.NAME,
                 "tastybento");
         verify(user).sendMessage("general.success");
+    }
+
+    /**
+     * An island soft-deleted by {@code /[admin] delete} keeps its blocks but is
+     * flagged deletable, which denies every protection flag on it and queues its
+     * region files for the housekeeping purge. Registering an owner has to clear
+     * that flag or the island stays unusable and still gets reaped.
+     */
+    @Test
+    void testRegisterClearsSoftDeleteFlag() {
+        testCanExecuteSuccess();
+        itl.register(user, "tastybento");
+        verify(island).setDeleted(false);
+        verify(island).setDeletable(false);
+    }
+
+    /**
+     * Test method for {@link AdminRegisterCommand#canExecute(org.bukkit.command.CommandSender, String, String[])}.
+     */
+    @Test
+    void testCanExecuteConsoleWithoutCoordinates() {
+        when(user.isPlayer()).thenReturn(false);
+        when(pm.getUUID(any())).thenReturn(notUUID);
+
+        assertFalse(itl.canExecute(user, itl.getLabel(), List.of("tastybento")));
+        verify(user).sendMessage("commands.admin.unregister.errors.specify-island-location");
+    }
+
+    /**
+     * Test method for {@link AdminRegisterCommand#canExecute(org.bukkit.command.CommandSender, String, String[])}.
+     */
+    @Test
+    void testCanExecuteConsoleWithCoordinates() {
+        when(user.isPlayer()).thenReturn(false);
+        when(user.getLocation()).thenReturn(null);
+        when(location.toVector()).thenReturn(new Vector(123, 123, 432));
+        when(island.getCenter()).thenReturn(location);
+        when(im.getIslandAt(any())).thenReturn(Optional.of(island));
+        when(pm.getUUID(any())).thenReturn(notUUID);
+
+        assertTrue(itl.canExecute(user, itl.getLabel(), List.of("tastybento", "-1600,80,3200")));
+    }
+
+    /**
+     * Test method for {@link AdminRegisterCommand#canExecute(org.bukkit.command.CommandSender, String, String[])}.
+     */
+    @Test
+    void testCanExecuteMalformedCoordinates() {
+        when(pm.getUUID(any())).thenReturn(notUUID);
+
+        assertFalse(itl.canExecute(user, itl.getLabel(), List.of("tastybento", "-1600,80")));
+        assertFalse(itl.canExecute(user, itl.getLabel(), List.of("tastybento", "here,there,everywhere")));
+        verify(user, times(2)).sendMessage("commands.admin.unregister.errors.specify-island-location");
     }
 
     /**

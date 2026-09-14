@@ -222,8 +222,9 @@ commands:
         success: '<green>Successfully decreased </green><aqua>[name]</aqua><green>''s [prefix_island] protected
           range to </green><aqua>[total] </aqua><gray>(</gray><aqua>-[number]</aqua><gray>)</gray><green>.</green>'
     register:
-      parameters: <player>
-      description: register player to unowned [prefix_island] you are on
+      parameters: <player> [x,y,z]
+      description: register player to unowned [prefix_island] you are on, or to the one
+        at x,y,z
       registered-island: '<green>Registered [name] to [prefix_island] at [xyz].</green>'
       reserved-island: '<green>Reserved [prefix_island] at [xyz] for [name].</green>'
       already-owned: '<red>[prefix_island] is already owned by another player!</red>'
