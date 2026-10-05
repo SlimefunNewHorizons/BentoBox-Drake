@@ -6,12 +6,12 @@
 
 ### High-Performance Island Engine, Data Components Deserializer & Multi-Modality Controller for DrakesCraft
 
-[![RepoRanker](https://reporanker.com/badge/DrakesCraft-Labs/BentoBox-Drake)](https://reporanker.com/repos/DrakesCraft-Labs/BentoBox-Drake)
+[![RepoRanker](https://reporanker.com/badge/SlimefunNewHorizons/BentoBox-Drake)](https://reporanker.com/repos/SlimefunNewHorizons/BentoBox-Drake)
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.21.11-7C4DFF?logo=minecraft&logoColor=white)](https://papermc.io/)
 [![Purpur](https://img.shields.io/badge/Purpur-1.21.11-FFA000?logo=purpur)](https://purpurmc.org/)
 [![Java](https://img.shields.io/badge/Java-21%2F25-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue)](./LICENSE)
-[![Zero-Item-Loss](https://img.shields.io/badge/Protection-Zero--Item--Loss-10B981)](https://github.com/DrakesCraft-Labs/BentoBox-Drake)
+[![Zero-Item-Loss](https://img.shields.io/badge/Protection-Zero--Item--Loss-10B981)](https://github.com/SlimefunNewHorizons/BentoBox-Drake)
 [![Network](https://img.shields.io/badge/Network-DrakesCraft_Production-00E5FF)](https://web.drakescraft.cl)
 
 **A sovereign downstream fork of BentoBox tailored for Purpur/Paper 1.21.11, providing native Data Components item resilience, seamless Slimefun4 compatibility, and multi-modal isolation across DrakesCraft's 5 game modes.**
@@ -19,7 +19,7 @@
 [🌐 Portal Oficial](https://web.drakescraft.cl) ·
 [🎮 Jugar en Vivo](https://web.drakescraft.cl/play) ·
 [💬 Discord Oficial](https://discord.gg/rv3vtXZTk7) ·
-[🏛️ Organización GitHub](https://github.com/DrakesCraft-Labs)
+[🏛️ Organización GitHub](https://github.com/SlimefunNewHorizons)
 
 </div>
 
@@ -71,7 +71,7 @@ BentoBox-Drake convive armónicamente con las 5 modalidades de la network sin ge
 ### Compilar desde el Código Fuente
 ```bash
 # Clonar el repositorio
-git clone https://github.com/DrakesCraft-Labs/BentoBox-Drake.git
+git clone https://github.com/SlimefunNewHorizons/BentoBox-Drake.git
 cd BentoBox-Drake
 
 # Compilar con Gradle (Java 21+)
@@ -89,7 +89,7 @@ El binario optimizado se generará en `build/libs/BentoBox-*.jar`.
 
 ## 📄 License & Upstream Attribution
 
-This project is a sovereign fork maintained by [**JackStar6677-1**](https://github.com/JackStar6677-1) under [**DrakesCraft Labs**](https://github.com/DrakesCraft-Labs).
+This project is a sovereign fork maintained by [**JackStar6677-1**](https://github.com/JackStar6677-1) under [**DrakesCraft Labs**](https://github.com/SlimefunNewHorizons).
 
 - **Original Project:** Created by the upstream authors and the open-source community.
 - **DrakesCraft Optimizations:** Modernized for Paper/Purpur 1.21.11+, Java 21, high concurrency, asynchronous safety, and exploit/duplication prevention.
