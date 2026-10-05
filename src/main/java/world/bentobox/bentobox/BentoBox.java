@@ -122,7 +122,8 @@ public class BentoBox extends JavaPlugin implements Listener {
 
     private BukkitTask blueprintLoadingTask;
 
-    private boolean shutdown;
+    // Written on the main thread in onLoad/onDisable, read by async tasks (WebManager, databases)
+    private volatile boolean shutdown;
 
     @Override
     public void onEnable(){

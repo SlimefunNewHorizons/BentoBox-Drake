@@ -70,6 +70,21 @@ public class WebManager {
     }
 
     public void requestGitHubData() {
+        if (plugin.isShutdown()) {
+            return;
+        }
+        try {
+            downloadGitHubData();
+        } catch (IllegalStateException | LinkageError e) {
+            // BentoBox was disabled while this async task was running: its jar is closed, so any
+            // class loaded from now on fails with "zip file closed". Only swallow it in that case.
+            if (!plugin.isShutdown()) {
+                throw e;
+            }
+        }
+    }
+
+    private void downloadGitHubData() {
         getGitHub().ifPresent(gh -> {
             if (plugin.getSettings().isLogGithubDownloadData()) {
                 plugin.log("Downloading data from GitHub...");
@@ -92,8 +107,18 @@ public class WebManager {
                 String topicsContent = getContent(weblinkRepo, "catalog/topics.json");
                 String catalogContent = getContent(weblinkRepo, "catalog/catalog.json");
 
+                // The downloads are slow: if BentoBox was disabled meanwhile its jar is closed and
+                // loading CatalogEntry would throw "zip file closed" from the plugin classloader.
+                if (plugin.isShutdown()) {
+                    return;
+                }
+
                 /* Parsing the data */
                 parseCatalogContent(tagsContent, topicsContent, catalogContent);
+            }
+
+            if (plugin.isShutdown()) {
+                return;
             }
 
             if (plugin.getSettings().isLogGithubDownloadData()) {
@@ -112,6 +137,9 @@ public class WebManager {
             }
 
             for (String repository : repositories) {
+                if (plugin.isShutdown()) {
+                    return;
+                }
                 GitHubRepository repo;
                 try {
                     repo = new GitHubRepository(gh, repository);
@@ -134,7 +162,7 @@ public class WebManager {
                 plugin.log("Successfully downloaded data from GitHub.");
             }
 
-            if (plugin.getSettings().isCheckBentoBoxUpdates()) {
+            if (plugin.getSettings().isCheckBentoBoxUpdates() && !plugin.isShutdown()) {
                 checkForUpdates(gh);
             }
         });
