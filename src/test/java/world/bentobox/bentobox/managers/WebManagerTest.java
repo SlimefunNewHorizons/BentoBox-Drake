@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -13,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import world.bentobox.bentobox.CommonTestSetup;
+import world.bentobox.bentobox.api.github.GitHubWebAPI;
 import world.bentobox.bentobox.web.catalog.CatalogEntry;
 import world.bentobox.bentobox.web.credits.Contributor;
 
@@ -144,5 +148,66 @@ class WebManagerTest extends CommonTestSetup {
     void testRequestGitHubDataNoGitHub() {
         // Should not throw when gitHub is not present
         wm.requestGitHubData();
+    }
+
+    @Test
+    void testRequestGitHubDataStopsWhenShutdown() throws Exception {
+        java.lang.reflect.Field field = WebManager.class.getDeclaredField("gitHub");
+        field.setAccessible(true);
+        field.set(wm, mock(GitHubWebAPI.class));
+        when(plugin.isShutdown()).thenReturn(true);
+
+        wm.requestGitHubData();
+
+        // Nothing past the catalog download may run once BentoBox is disabled
+        verify(plugin, never()).getAddonsManager();
+        assertTrue(wm.getAddonsCatalog().isEmpty());
+    }
+
+    @Test
+    void testRequestGitHubDataStopsWhenShutdownDuringDownload() throws Exception {
+        GitHubWebAPI gh = mock(GitHubWebAPI.class);
+        java.lang.reflect.Field field = WebManager.class.getDeclaredField("gitHub");
+        field.setAccessible(true);
+        field.set(wm, gh);
+
+        java.util.concurrent.atomic.AtomicBoolean shutdown = new java.util.concurrent.atomic.AtomicBoolean(false);
+        when(plugin.isShutdown()).thenAnswer(inv -> shutdown.get());
+        String catalog = "{\"gamemodes\":[],\"addons\":[{\"name\":\"x\"}]}";
+        com.google.gson.JsonObject file = new com.google.gson.JsonObject();
+        file.addProperty("content", java.util.Base64.getEncoder().encodeToString(catalog.getBytes()));
+        // The barrier: BentoBox gets disabled while the first catalog file is being downloaded
+        when(gh.fetch(org.mockito.ArgumentMatchers.anyString())).thenAnswer(inv -> {
+            shutdown.set(true);
+            return file;
+        });
+
+        wm.requestGitHubData();
+
+        assertTrue(wm.getAddonsCatalog().isEmpty());
+        verify(plugin, never()).getAddonsManager();
+    }
+
+    @Test
+    void testRequestGitHubDataSwallowsClosedJarOnlyAfterShutdown() throws Exception {
+        GitHubWebAPI gh = mock(GitHubWebAPI.class);
+        java.lang.reflect.Field field = WebManager.class.getDeclaredField("gitHub");
+        field.setAccessible(true);
+        field.set(wm, gh);
+
+        java.util.concurrent.atomic.AtomicBoolean shutdown = new java.util.concurrent.atomic.AtomicBoolean(false);
+        when(plugin.isShutdown()).thenAnswer(inv -> shutdown.get());
+        // Contributors step: the classloader is already closed when the addon list is read
+        when(plugin.getAddonsManager()).thenAnswer(inv -> {
+            shutdown.set(true);
+            throw new IllegalStateException("zip file closed");
+        });
+
+        wm.requestGitHubData();
+
+        // With BentoBox still enabled the same failure must surface
+        shutdown.set(false);
+        when(plugin.getAddonsManager()).thenThrow(new IllegalStateException("zip file closed"));
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalStateException.class, wm::requestGitHubData);
     }
 }
