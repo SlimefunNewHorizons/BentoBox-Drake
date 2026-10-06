@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -13,6 +14,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -46,6 +48,14 @@ public class WebManager {
     private final List<CatalogEntry> gamemodesCatalog;
     @NonNull
     private final Map<String, List<Contributor>> contributors;
+    /**
+     * The scheduler cancels future plugin tasks during disable, but a task that is already
+     * fetching the catalog can outlive {@code onDisable()}. Do not let that task touch BentoBox
+     * after Paper has started closing its class loader.
+     */
+    private final AtomicBoolean shutdown = new AtomicBoolean();
+    @Nullable
+    private BukkitTask githubDataTask;
 
     public WebManager(@NonNull BentoBox plugin) {
         this.plugin = plugin;
@@ -60,17 +70,23 @@ public class WebManager {
             long connectionInterval = plugin.getSettings().getGithubConnectionInterval() * 20L * 60L;
             if (connectionInterval <= 0) {
                 // If below 0, it means we shouldn't run this as a repeating task.
-                plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, this::requestGitHubData, 20L);
+                githubDataTask = plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, this::requestGitHubData, 20L);
             } else {
                 // Set connection interval to be at least 60 minutes.
                 connectionInterval = Math.max(connectionInterval, 60 * 20 * 60L);
-                plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this::requestGitHubData, 20L, connectionInterval);
+                githubDataTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this::requestGitHubData, 20L, connectionInterval);
             }
         }
     }
 
     public void requestGitHubData() {
+        if (shutdown.get()) {
+            return;
+        }
         getGitHub().ifPresent(gh -> {
+            if (shutdown.get()) {
+                return;
+            }
             if (plugin.getSettings().isLogGithubDownloadData()) {
                 plugin.log("Downloading data from GitHub...");
                 plugin.log("Updating the Catalog...");
@@ -93,7 +109,13 @@ public class WebManager {
                 String catalogContent = getContent(weblinkRepo, "catalog/catalog.json");
 
                 /* Parsing the data */
-                parseCatalogContent(tagsContent, topicsContent, catalogContent);
+                if (!shutdown.get()) {
+                    parseCatalogContent(tagsContent, topicsContent, catalogContent);
+                }
+            }
+
+            if (shutdown.get()) {
+                return;
             }
 
             if (plugin.getSettings().isLogGithubDownloadData()) {
@@ -112,6 +134,9 @@ public class WebManager {
             }
 
             for (String repository : repositories) {
+                if (shutdown.get()) {
+                    return;
+                }
                 GitHubRepository repo;
                 try {
                     repo = new GitHubRepository(gh, repository);
@@ -140,7 +165,23 @@ public class WebManager {
         });
     }
 
+    /**
+     * Stops catalog polling before the plugin class loader is released.
+     *
+     * <p>An in-flight HTTP request cannot be safely interrupted from the server thread; the
+     * shutdown flag makes it return at its next boundary without parsing data, consulting addons,
+     * or emitting update output.</p>
+     */
+    public void shutdown() {
+        if (shutdown.compareAndSet(false, true) && githubDataTask != null) {
+            githubDataTask.cancel();
+        }
+    }
+
     private void parseCatalogContent(String tagsContent, String topicsContent, String catalogContent) {
+        if (shutdown.get()) {
+            return;
+        }
         // Register the tags translations in the locales
         if (!tagsContent.isEmpty()) {
             try {
@@ -255,6 +296,9 @@ public class WebManager {
     }
 
     private void gatherContributors(@NonNull GitHubRepository repo) {
+        if (shutdown.get()) {
+            return;
+        }
         try {
             List<Contributor> addonContributors = new LinkedList<>();
             for (GitHubContributor gitHubContributor : repo.getContributors()) {

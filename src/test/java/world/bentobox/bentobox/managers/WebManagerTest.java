@@ -86,6 +86,13 @@ class WebManagerTest extends CommonTestSetup {
     }
 
     @Test
+    void shutdownIsSafeWithoutAGithubPollingTask() {
+        wm.shutdown();
+        wm.shutdown();
+        wm.requestGitHubData();
+    }
+
+    @Test
     void testIsNewerVersion_newerPatch() {
         assertTrue(WebManager.isNewerVersion("3.11.2", "3.11.3"));
     }

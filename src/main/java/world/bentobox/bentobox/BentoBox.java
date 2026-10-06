@@ -339,6 +339,12 @@ public class BentoBox extends JavaPlugin implements Listener {
         // Stop all async database tasks
         shutdown = true;
 
+        // A catalog request can still be running after Bukkit cancels its scheduled task. Mark it
+        // before managers/addons are torn down so it cannot access classes after this JAR closes.
+        if (webManager != null) {
+            webManager.shutdown();
+        }
+
         HeadGetter.shutdown();
 
         if (addonsManager != null) {
