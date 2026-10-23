@@ -231,6 +231,10 @@ public class BentoBox extends JavaPlugin implements Listener {
         mapManager = new MapManager(this);
         hookRegistrar.registerMapHooks();
 
+        // Addons schedule catalog requests while enabling. Their WebManagers depend on
+        // this instance, so it must exist before addon enablement starts.
+        webManager = new WebManager(this);
+
         // Enable addons
         addonsManager.enableAddons();
 
@@ -272,8 +276,6 @@ public class BentoBox extends JavaPlugin implements Listener {
 
         // TODO: re-enable after implementation
         // TODO: re-enable after rework
-
-        webManager = new WebManager(this);
 
         // Housekeeping: auto-purge of unused region files (default OFF)
         housekeepingManager = new HousekeepingManager(this);
