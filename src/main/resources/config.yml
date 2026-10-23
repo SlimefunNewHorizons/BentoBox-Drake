@@ -49,7 +49,7 @@ general:
     port: 3306
     name: bentobox
     username: username
-    password: password
+    password: __REDACTED__
     # How often the data will be saved to file in mins. Default is 5 minutes.
     # This helps prevent issues if the server crashes.
     # Data is also saved at important points in the game.
